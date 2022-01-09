@@ -26,14 +26,114 @@ const layerConfigurations = [
   {
     growEditionSizeTo: 5,
     layersOrder: [
-      { name: "Background" },
-      { name: "Eyeball" },
-      { name: "Eye color" },
-      { name: "Iris" },
-      { name: "Shine" },
-      { name: "Bottom lid" },
-      { name: "Top lid" },
+      { 
+        isRender: true,
+        name: "Background",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Eyeball",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Eye color",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Iris",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Shine",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Bottom lid",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
+      { 
+        isRender: true,
+        name: "Top lid",
+        size: {
+          width: 512,
+          height: 512,
+        },
+        pos: {
+          x: 0,
+          y: 0,
+        },
+        rotation: 0,
+        opacity: 100,
+        randomColor: false,
+      },
     ],
+    renderOrder: [ 1, 2, 3, 4, 5, 6, 7],
+    randomRender: false,
   },
 ];
 

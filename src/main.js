@@ -83,8 +83,23 @@ const getElements = (path) => {
     });
 };
 
-const layersSetup = (layersOrder) => {
-  const layers = layersOrder.map((layerObj, index) => ({
+const layersSetup = (configlayers) => {
+  let newLayerOrders = [];
+  if(configlayers.randomRender === false){
+    configlayers.renderOrder.forEach((item) => {
+      newLayerOrders.push(configlayers.layersOrder[item - 1]);
+    })
+  }else{
+    let newArray = shuffle(configlayers.renderOrder);
+    newArray.forEach((item) => {
+      newLayerOrders.push(configlayers.layersOrder[item - 1]);
+    })
+  }
+  
+  newLayerOrders = newLayerOrders.filter((item) => {
+    return item.isRender;
+  })
+  const layers = newLayerOrders.map((layerObj, index) => ({
     id: index,
     elements: getElements(`${layersDir}/${layerObj.name}/`),
     name:
@@ -96,9 +111,31 @@ const layersSetup = (layersOrder) => {
         ? layerObj.options?.["blend"]
         : "source-over",
     opacity:
-      layerObj.options?.["opacity"] != undefined
-        ? layerObj.options?.["opacity"]
+      layerObj?.opacity != undefined
+        ? layerObj?.opacity/100
         : 1,
+    size:
+      layerObj?.size != undefined
+        ? layerObj?.size
+        : {
+          width: 512,
+          height: 512,
+        },
+    pos:
+      layerObj?.pos != undefined
+        ? layerObj?.pos
+        : {
+          x: 0,
+          y: 0,
+        },
+    rotation:
+      layerObj?.rotation != undefined
+        ? layerObj?.rotation
+        : 0,
+    randomColor:
+      layerObj?.randomColor != undefined
+        ? layerObj?.randomColor
+        : false,
     bypassDNA:
       layerObj.options?.["bypassDNA"] !== undefined
         ? layerObj.options?.["bypassDNA"]
@@ -191,24 +228,52 @@ const addText = (_sig, x, y, size) => {
   ctx.fillText(_sig, x, y);
 };
 
+function getRndColor() {
+  var r = 255*Math.random()|0,
+      g = 255*Math.random()|0,
+      b = 255*Math.random()|0;
+  return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
 const drawElement = (_renderObject, _index, _layersLen) => {
   ctx.globalAlpha = _renderObject.layer.opacity;
   ctx.globalCompositeOperation = _renderObject.layer.blend;
-  text.only
-    ? addText(
-        `${_renderObject.layer.name}${text.spacer}${_renderObject.layer.selectedElement.name}`,
-        text.xGap,
-        text.yGap * (_index + 1),
-        text.size
-      )
-    : ctx.drawImage(
-        _renderObject.loadedImage,
+  if(text.only){
+    addText(
+      `${_renderObject.layer.name}${text.spacer}${_renderObject.layer.selectedElement.name}`,
+      text.xGap,
+      text.yGap * (_index + 1),
+      text.size
+    )
+  }else{
+    ctx.drawImage(
+      _renderObject.loadedImage,
+      0,
+      0,
+      format.width,
+      format.height,
+      _renderObject.layer.pos.x,
+      _renderObject.layer.pos.y,
+      _renderObject.layer.size.width,
+      _renderObject.layer.size.height,
+    );
+    ctx.translate(format.width / 2, format.height / 2);
+    ctx.rotate(_renderObject.layer.rotation * Math.PI / 180);
+    ctx.translate( -format.width / 2, -format.height / 2 );
+
+    if(_renderObject.layer.randomColor){
+      ctx.fillStyle = getRndColor();          // set random color
+      ctx.fillRect(
         0,
         0,
         format.width,
-        format.height
-      );
-
+        format.height,
+        _renderObject.layer.pos.x,
+        _renderObject.layer.pos.y,
+        _renderObject.layer.size.width,
+        _renderObject.layer.size.height,); 
+    }
+  }
   addAttributes(_renderObject);
 };
 
@@ -221,6 +286,10 @@ const constructLayerToDna = (_dna = "", _layers = []) => {
       name: layer.name,
       blend: layer.blend,
       opacity: layer.opacity,
+      size: layer.size,
+      pos: layer.pos,
+      rotation: layer.rotation,
+      randomColor: layer.randomColor,
       selectedElement: selectedElement,
     };
   });
@@ -347,7 +416,7 @@ const startCreating = async () => {
     : null;
   while (layerConfigIndex < layerConfigurations.length) {
     const layers = layersSetup(
-      layerConfigurations[layerConfigIndex].layersOrder
+      layerConfigurations[layerConfigIndex]
     );
     while (
       editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo
@@ -360,7 +429,6 @@ const startCreating = async () => {
         results.forEach((layer) => {
           loadedElements.push(loadLayerImg(layer));
         });
-
         await Promise.all(loadedElements).then((renderObjectArray) => {
           debugLogs ? console.log("Clearing canvas") : null;
           ctx.clearRect(0, 0, format.width, format.height);
