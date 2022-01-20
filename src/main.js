@@ -32,6 +32,8 @@ const DNA_DELIMITER = "-";
 const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
 
 let hashlipsGiffer = null;
+let layerRate = [0, 0, 0, 0, 0, 0, 0];
+const creationRate = layerConfigurations[0].creationRate;
 
 const buildSetup = () => {
   if (fs.existsSync(buildDir)) {
@@ -110,6 +112,10 @@ const layersSetup = (configlayers) => {
       layerObj.options?.["blend"] != undefined
         ? layerObj.options?.["blend"]
         : "source-over",
+    layerId:
+      layerObj?.layerId != undefined
+        ? layerObj?.layerId
+        : 1,
     opacity:
       layerObj?.opacity != undefined
         ? layerObj?.opacity/100
@@ -235,6 +241,10 @@ function getRndColor() {
   return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 
+function isTransparent(x, y) { // x, y coordinate of pixel
+  return ctx.getImageData(x, y, 1, 1).data[3] === 0; // 4th byte is alpha
+}
+
 const drawElement = (_renderObject, _index, _layersLen) => {
   ctx.globalAlpha = _renderObject.layer.opacity;
   ctx.globalCompositeOperation = _renderObject.layer.blend;
@@ -263,15 +273,22 @@ const drawElement = (_renderObject, _index, _layersLen) => {
 
     if(_renderObject.layer.randomColor){
       ctx.fillStyle = getRndColor();          // set random color
-      ctx.fillRect(
-        0,
-        0,
-        format.width,
-        format.height,
-        _renderObject.layer.pos.x,
-        _renderObject.layer.pos.y,
-        _renderObject.layer.size.width,
-        _renderObject.layer.size.height,); 
+      
+      for(let x = 0; x < _renderObject.layer.size.width; x++){
+        for(let y = 0; y < _renderObject.layer.size.height; y++){
+          if(isTransparent(x, y)){
+            ctx.fillRect(
+              0,
+              0,
+              format.width,
+              format.height,
+              _renderObject.layer.pos.x,
+              _renderObject.layer.pos.y,
+              1,
+              1,);
+          }
+        }
+      }
     }
   }
   addAttributes(_renderObject);
@@ -415,12 +432,26 @@ const startCreating = async () => {
     ? console.log("Editions left to create: ", abstractedIndexes)
     : null;
   while (layerConfigIndex < layerConfigurations.length) {
-    const layers = layersSetup(
+    let layers = layersSetup(
       layerConfigurations[layerConfigIndex]
     );
+
     while (
       editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo
     ) {
+
+      layers = layers.filter((item) => {
+        layerRate[item.layerId] += 20;
+        if(creationRate[item.layerId] >= layerRate[item.layerId])
+          return true;
+        else
+          return false;
+        return false;
+      })
+  
+      if(layers.length <= 0)
+        return;
+      
       let newDna = createDna(layers);
       if (isDnaUnique(dnaList, newDna)) {
         let results = constructLayerToDna(newDna, layers);

@@ -27,6 +27,7 @@ const layerConfigurations = [
     growEditionSizeTo: 5,
     layersOrder: [
       { 
+        layerId: 0,
         isRender: true,
         name: "Background",
         size: {
@@ -42,6 +43,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 1,
         isRender: true,
         name: "Eyeball",
         size: {
@@ -57,6 +59,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 2,
         isRender: true,
         name: "Eye color",
         size: {
@@ -72,6 +75,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 3,
         isRender: true,
         name: "Iris",
         size: {
@@ -87,6 +91,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 4,
         isRender: true,
         name: "Shine",
         size: {
@@ -102,6 +107,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 5,
         isRender: true,
         name: "Bottom lid",
         size: {
@@ -117,6 +123,7 @@ const layerConfigurations = [
         randomColor: false,
       },
       { 
+        layerId: 6,
         isRender: true,
         name: "Top lid",
         size: {
@@ -134,6 +141,7 @@ const layerConfigurations = [
     ],
     renderOrder: [ 1, 2, 3, 4, 5, 6, 7],
     randomRender: false,
+    creationRate: [ 100, 100, 100, 100, 100, 100, 100 ],
   },
 ];
 
